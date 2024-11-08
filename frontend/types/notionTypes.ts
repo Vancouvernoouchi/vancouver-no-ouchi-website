@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 // 日付プロパティに関する型定義
 export type DateProperty = {
   id: string;
@@ -145,10 +147,49 @@ export type PropertyData = {
   タイトル: TitleProperty;
 };
 
+export type FormattedPropertyData = {
+  id: string;
+  moveInDate: string;
+  image: string;
+  hasSauna: boolean;
+  minimumStay: string;
+  bathroomShareCount: string;
+  rent: number;
+  status: string;
+  forCouple: boolean;
+  deposit: number;
+  inquiryForm: string;
+  closestStation: string;
+  targetGender: string;
+  hasKey: boolean;
+  area: string;
+  forMale: boolean;
+  staffComment: string;
+  hasPool: boolean;
+  moveOutDate: string;
+  forFemale: boolean;
+  hasWifi: boolean;
+  hasUtilities: boolean;
+  timeToStation: string;
+  kitchenShareCount: string;
+  hasLaundry: boolean;
+  hasGym: boolean;
+  thumbnail: string;
+  zone: string;
+  houseShareCount: string;
+  title: string;
+};
+
 // Notionページ全体の型定義
 export type NotionPage = {
   object: "page";
   id: string;
   created_time: string;
   properties: PropertyData;
+};
+
+export type AmenitiesProps = {
+  icon: LucideIcon;
+  value: boolean;
+  message: string;
 };
