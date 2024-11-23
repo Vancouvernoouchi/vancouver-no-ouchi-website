@@ -1,6 +1,6 @@
 "use client";
 import PropertyImage from "@/components/atoms/propertyPage/PropertyImage";
-import React, { FC, ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { AmenitiesProps, FormattedPropertyData } from "@/types/notionTypes";
 import {
   ArrowRight,
@@ -40,23 +40,44 @@ import OuchiLogo from "@/public/vancouver_no_ouchi_logo2.png";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-interface PropertyPageProps {
-  property: FormattedPropertyData;
-}
-
 /**
  * 物件詳細ページのコンポーネント
- * @param property　 {NotionPage}
+ * @param property　 {FormattedPropertyData}
  */
-const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
+const PropertyPage = ({ property }: { property: FormattedPropertyData }) => {
+  const targetGender = () => {
+    if (property.forFemale) {
+      return "女性";
+    } else if (property.forMale) {
+      return "男性";
+    } else {
+      return "性別を問わない";
+    }
+  };
   // 入居条件表示用
   const conditions: { name: string; value: string }[] = [
-    { name: "対象者", value: property.targetGender },
+    { name: "対象者", value: targetGender() },
     { name: "カップル入居", value: property.forCouple ? "可能" : "不可" },
+    { name: "ルームメイトの性別", value: property.roommatesGender || "確認中" },
     { name: "最低滞在期間", value: property.minimumStay + "〜" },
-    { name: "お家シェア人数", value: property.houseShareCount + "人" },
-    { name: "キッチンシェア人数", value: property.kitchenShareCount + "人" },
-    { name: "バスルームシェア人数", value: property.bathroomShareCount + "人" },
+    {
+      name: "お家シェア人数",
+      value: property.houseShareCount
+        ? `${property.houseShareCount}人`
+        : "確認中",
+    },
+    {
+      name: "キッチンシェア人数",
+      value: property.kitchenShareCount
+        ? `${property.kitchenShareCount}人`
+        : "確認中",
+    },
+    {
+      name: "バスルームシェア人数",
+      value: property.bathroomShareCount
+        ? `${property.bathroomShareCount}人`
+        : "確認中",
+    },
   ];
 
   // 設備表示用
@@ -101,6 +122,17 @@ const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
   // ヘッダーから遷移できる情報エリアの表示用
   const propertyInfoList: { id: string; title: string; body: ReactNode }[] = [
     {
+      id: "images",
+      title: "",
+      body: (
+        <PropertyImage
+          imgUrl={property.thumbnail}
+          title={property.title}
+          imgLink={property.image}
+        />
+      ),
+    },
+    {
       id: "basic-info",
       title: "基本情報",
       body: (
@@ -129,7 +161,7 @@ const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
       title: "スタッフからのコメント",
       body: <StaffComment comment={property.staffComment} />,
     },
-    { id: "map", title: "アクセスマップ", body: <AccessMap /> },
+    // { id: "map", title: "アクセスマップ", body: <AccessMap /> },
     { id: "neighbors", title: "周辺情報", body: <Neighbors /> },
     // {
     //   id: "available-properties",
@@ -170,11 +202,11 @@ const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
         </Breadcrumb>
       </div>
 
-      <div className="px-base flex flex-col sm:flex-row sm:justify-between items-center gap-2 py-3 sm:py-5">
+      <div className="px-base flex flex-col sm:flex-row sm:justify-between items-center gap-3 py-3 sm:py-5">
         {/* ---　　タイトルエリア --- */}
         <div className="flex gap-2 items-center">
           <div
-            className={`px-5 py-2 border rounded-full bg-${statusBgColor} text-${statusTextColor}`}
+            className={`px-5 py-2 rounded-full bg-${statusBgColor} text-${statusTextColor}`}
           >
             {property.status}
           </div>
@@ -194,22 +226,13 @@ const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
         </div>
       </div>
 
-      {/* --- 画像エリア --- */}
-      <div id="images">
-        <PropertyImage
-          imgUrl={property.thumbnail}
-          title={property.title}
-          imgLink={property.image}
-        />
-      </div>
-
       {/* --- ヘッダーから遷移できる情報エリア --- */}
       <div className="lg:h-[60lvh] flex flex-col lg:flex-row lg:justify-between mx-auto">
         <div className="w-full lg:w-[60%] lg:pr-5">
           {propertyInfoList.map((info) => (
             <div id={info.id} key={info.id} className="border-b">
               <>
-                <SectionTitle title={info.title} />
+                {info.title && <SectionTitle title={info.title} />}
                 <>{info.body}</>
               </>
             </div>
@@ -219,7 +242,9 @@ const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
         <div className="w-full lg:w-[40%] xl:pl-14">
           {/* お問い合わせエリア */}
           <div>
-            <SectionTitle title="お問い合わせ" />
+            <div className="text-base sm:text-xl font-semibold tracking-widest">
+              お問い合わせ
+            </div>
             <ContactCard />
           </div>
           {/* サービス内容紹介エリア */}
@@ -230,7 +255,12 @@ const PropertyPage: FC<PropertyPageProps> = ({ property }) => {
         </div>
       </div>
 
-      <ContactPopUp />
+      <div className="hidden sm:block">
+        <ContactPopUpPC />
+      </div>
+      <div className="block sm:hidden">
+        <ContactPopUpSP />
+      </div>
     </div>
   );
 };
@@ -251,18 +281,35 @@ const SectionTitle = ({ title }: { title: string }) => {
 };
 
 /**
- * 右下、『まずは無料相談』コンポーネント
+ * 右下、『まずは無料相談』コンポーネント（パソコン）
  *
  */
-const ContactPopUp = () => {
+const ContactPopUpPC = () => {
   return (
     <Link
-      className="fixed bottom-3 right-3 sm:bottom-10 sm:right-10 h-32 w-32 rounded-full bg-red-600 text-white flex flex-col items-center justify-center gap-1 tracking-widest hover:scale-105"
+      className="fixed sm:bottom-10 sm:right-10 h-32 w-32 rounded-full bg-red-600 text-white flex flex-col items-center justify-center gap-1 tracking-widest hover:scale-105"
       href="https://www.instagram.com/vancouver.no.ouchi/"
       target="_blank"
     >
       <div>まずは</div>
       <div className="font-semibold">無料相談</div>
+      <ArrowRight />
+    </Link>
+  );
+};
+
+/**
+ * 右下、『まずは無料相談』コンポーネント（スマホ）
+ *
+ */
+const ContactPopUpSP = () => {
+  return (
+    <Link
+      className="fixed bottom-0 right-0 bg-red-600 text-white flex items-center gap-1 tracking-widest p-3 rounded-tl-lg"
+      href="https://www.instagram.com/vancouver.no.ouchi/"
+      target="_blank"
+    >
+      <div className="font-semibold">まずは無料相談</div>
       <ArrowRight />
     </Link>
   );

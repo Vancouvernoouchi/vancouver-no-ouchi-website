@@ -1,5 +1,9 @@
 import { formatDateToYMD } from "@/components/organisms/propertiesList/FilterDialog";
-import { DateProperty } from "@/types/notionTypes";
+import {
+  DateProperty,
+  FormattedPropertyData,
+  NotionProperty,
+} from "@/types/notionTypes";
 import { BadgeCheck, Ban, Circle, X } from "lucide-react";
 export const getPropertyValue = (
   property: any, // ex) p.properties.エリア
@@ -119,4 +123,58 @@ export const matchParams = (
   return paramsArray.length > 0
     ? paramsArray.includes(getPropertyValue(property, type))
     : true;
+};
+
+/**
+ * fechした物件データをkeyとvalueに整理する関数
+ * カードと詳細ページで使用予定
+ *
+ * @param data {NotionProperty}
+ * @return {FormattedPropertyData}
+ */
+export const formatPropertyData = (
+  data: NotionProperty
+): FormattedPropertyData | null => {
+  // propertiesが存在しない場合はnullを返す
+  if (!data || !data.properties) {
+    console.error("propertiesデータが存在しません");
+    return null;
+  }
+
+  return {
+    id: data.id,
+    moveInDate: data.properties["入居可能日"]?.date?.start || null,
+    image: data.properties["物件写真"]?.url || null,
+    hasSauna: data.properties["サウナ"]?.checkbox || false,
+    minimumStay: data.properties["ミニマムステイ"]?.select?.name || null,
+    bathroomShareCount:
+      data.properties["バスルームのシェア人数"]?.select?.name || null,
+    rent: data.properties["家賃"]?.number || 0,
+    status: data.properties["ステータス"]?.status?.name || null,
+    forCouple: data.properties["カップル可"]?.checkbox || false,
+    deposit: data.properties["デポジット"]?.number || 0,
+    inquiryForm: data.properties["お問い合わせフォーム"]?.url || null,
+    closestStation: data.properties["最寄り駅"]?.select?.name || null,
+    roommatesGender: data.properties["住居人の性別"]?.select?.name || null,
+    hasKey: data.properties["鍵付き"]?.checkbox || false,
+    area: data.properties["エリア"]?.select?.name || null,
+    forMale: data.properties["男性限定"]?.checkbox || false,
+    staffComment:
+      data.properties["スタッフからのコメント"]?.rich_text?.[0]?.plain_text ||
+      null,
+    hasPool: data.properties["プール"]?.checkbox || false,
+    moveOutDate: data.properties["退去予定日"]?.date?.start || null,
+    forFemale: data.properties["女性限定"]?.checkbox || false,
+    hasWifi: data.properties["Wifi込み"]?.checkbox || false,
+    hasUtilities: data.properties["光熱費込み"]?.checkbox || false,
+    timeToStation: data.properties["最寄り駅まで"]?.select?.name || null,
+    kitchenShareCount:
+      data.properties["キッチンのシェア人数"]?.select?.name || null,
+    hasLaundry: data.properties["ランドリー無料"]?.checkbox || false,
+    hasGym: data.properties["ジム"]?.checkbox || false,
+    thumbnail: data.properties["サムネイル"]?.files?.[0]?.file?.url || null,
+    zone: data.properties["ゾーン"]?.select?.name || null,
+    houseShareCount: data.properties["物件のシェア人数"]?.select?.name || null,
+    title: data.properties["タイトル"]?.title?.[0]?.text?.content || null,
+  };
 };

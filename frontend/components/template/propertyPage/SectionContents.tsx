@@ -87,7 +87,7 @@ export const BasicInfo = ({
 /**
  * 入居条件エリアコンポーネント
  *
- * @param targetGender {string}
+ * @param roommatesGender {string}
  * @param forCouple {boolean}
  * @param minimumStay {string}
  * @param houseShareCount {string}
@@ -140,8 +140,20 @@ export const Amenities = ({ amenities }: { amenities: AmenitiesProps[] }) => {
             key={amenity.message}
             className="flex flex-col items-center gap-2"
           >
-            <Icon className="w-20 h-20 p-5 rounded-md bg-grayThemeColor text-themeColor font-thin" />
-            <div>{amenity.message}</div>
+            <Icon
+              className={`w-20 h-20 p-5 rounded-md bg-grayThemeColor font-thin ${
+                amenity.value
+                  ? "bg-grayThemeColor text-themeColor"
+                  : "bg-gray-200 text-gray-300"
+              }`}
+            />
+            <div
+              className={`${
+                amenity.value ? "text-themeColor" : "text-gray-400"
+              }`}
+            >
+              {amenity.message}
+            </div>
           </div>
         );
       })}
@@ -151,7 +163,6 @@ export const Amenities = ({ amenities }: { amenities: AmenitiesProps[] }) => {
 
 /**
  * スタッフからのコメントコンポーネント
- * 他でも使うならもっと抽象的にしてコンポーネント化します
  *
  * @param comment {string}
  */
@@ -201,9 +212,9 @@ export const Neighbors = () => {
   const tabLabels: string[] = ["エリア紹介", "飲食店", "その他"];
 
   const contents: ReactNode[] = [
-    <div key="0">現在、準備中です</div>,
-    <div key="2">カフェ・レストラン情報：現在、準備中です</div>,
-    <div key="3">その他近隣情報：現在、準備中です</div>,
+    <div key="0">準備中</div>,
+    <div key="2">準備中</div>,
+    <div key="3">準備中</div>,
   ];
 
   return (
