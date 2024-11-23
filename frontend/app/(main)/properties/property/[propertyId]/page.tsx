@@ -1,4 +1,7 @@
 import PropertyPage from "@/components/template/propertyPage/PropertyPage";
+import { FormattedPropertyData, NotionProperty } from "@/types/notionTypes";
+import { formatPropertyData } from "@/utlis/getPropertyValue";
+import { AxiosResponse } from "axios";
 import { apiClient, apiClientFetch } from "@/config/apiClient";
 import { getPropertyValue } from "@/utlis/getPropertyValue";
 import axios from "axios";
@@ -37,6 +40,12 @@ export async function generateMetadata(
   }
 }
 
+/**
+ * 物件詳細ページに必要なデータをfetchし整理するコンポーネント
+ *
+ * @param params { propertyId: string }
+ *
+ */
 const PropertyDetailPage = async ({
   params,
 }: {
@@ -44,20 +53,25 @@ const PropertyDetailPage = async ({
 }) => {
   const { propertyId } = params;
   try {
-    // const property = await apiClientFetch(`/properties/${propertyId}`, {
-    //   method: "GET",
-    //   next: {
-    //     revalidate: 300,
-    //   },
-    // });
-
-    // // just in case using axios
-    const { data: property } = await apiClient.get(`/properties/${propertyId}`);
-    return (
-      <div>
-        <PropertyPage property={property} />
-      </div>
+    const response: AxiosResponse = await apiClient.get(
+      `/properties/${propertyId}`
     );
+    const data: NotionProperty = response.data;
+    const propertyData: FormattedPropertyData | null = formatPropertyData(data);
+
+    if (propertyData !== null) {
+      return (
+        <div>
+          <PropertyPage property={propertyData} />
+        </div>
+      );
+    } else {
+      return (
+        <div className="h-[88vh] p-2 flex flex-col justify-center items-center text-center text-red-500 text-xl">
+          物件情報が見つかりませんでした。URLをお確かめください。
+        </div>
+      );
+    }
   } catch (error) {
     console.error("Failed to fetch properties:", error);
     return (
