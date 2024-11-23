@@ -147,6 +147,12 @@ export type PropertyData = {
   タイトル: TitleProperty;
 };
 
+export type NotionProperty = {
+  object: string;
+  id: string;
+  properties: Record<string, any>;
+};
+
 export type FormattedPropertyData = {
   id: string;
   moveInDate: string;
@@ -160,7 +166,7 @@ export type FormattedPropertyData = {
   deposit: number;
   inquiryForm: string;
   closestStation: string;
-  targetGender: string;
+  roommatesGender: string;
   hasKey: boolean;
   area: string;
   forMale: boolean;

@@ -37,11 +37,13 @@ export const ReadMore = ({ text }: { text: string }) => {
       {/* 展開/閉じるボタン */}
       {showButtonAndGradient && (
         <button
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 mt-10 px-10 py-2 z-10 rounded-full flex items-center justify-center gap-2 text-sm bg-grayThemeColor text-themeColor"
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 mt-10 px-5 sm:px-10 py-2 z-10 rounded-full flex items-center justify-center gap-2 text-sm bg-grayThemeColor text-themeColor"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           {isExpanded ? <ChevronUp /> : <ChevronDown />}
-          <span>{isExpanded ? "閉じる" : "続きを読む"}</span>
+          <span className="text-xs">
+            {isExpanded ? "閉じる" : "続きを読む"}
+          </span>
         </button>
       )}
     </div>
